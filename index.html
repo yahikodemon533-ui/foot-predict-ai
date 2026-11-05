@@ -382,7 +382,7 @@ function chargerMatchs() {
 
   // LE PROXY POUR GITHUB PAGES (Contourne le blocage CORS)
   const TARGET_URL = `https://api.the-odds-api.com/v4/sports/${league}/odds/?apiKey=${API_KEY}&regions=eu&markets=h2h,totals`;
- const API_URL = `https://corsproxy.io/?${encodeURIComponent(TARGET_URL)}`;
+ const API_URL = `/api/v4/sports/${league}/odds/?apiKey=${API_KEY}&regions=eu&markets=h2h,totals`;
   fetch(API_URL)
   .then(reponse => reponse.json())
   .then(donnees => {
