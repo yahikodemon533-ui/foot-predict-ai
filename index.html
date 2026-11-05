@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Yahiko Pronos - VIP</title>
+<title>Yahiko Pronos - 100% Réel</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -23,6 +23,8 @@
   /* HEADER */
   .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: var(--bg-color); position: sticky; top: 0; z-index: 10;}
   .header h1 { font-size: 18px; color: var(--gold); font-weight: 800;}
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+  .theme-btn { background: var(--dark-btn); color: var(--text-main); border: none; padding: 8px; border-radius: 50%; cursor: pointer; font-size: 16px; }
   .vip-badge { background: linear-gradient(45deg, #ffd700, #ff8c00); color: #000; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 10px rgba(255, 193, 7, 0.4);}
   
   /* BANNIÈRE VIP */
@@ -39,7 +41,7 @@
   .view { display: none; } 
   .view.active { display: block; } 
 
-  /* BARRE DE FILTRES (Marchés) */
+  /* BARRE DE FILTRES */
   .filters-container { background: var(--card-bg); padding-bottom: 10px; border-bottom: 2px solid var(--gold); margin-top: 5px;}
   .markets-bar { display: flex; padding: 10px 15px; gap: 10px; overflow-x: auto; scrollbar-width: none;}
   .markets-bar::-webkit-scrollbar { display: none; }
@@ -56,7 +58,7 @@
   .star-icon { position: absolute; top: 15px; right: 15px; font-size: 20px; cursor: pointer; z-index: 5; color: var(--text-muted); transition: 0.2s;}
   .star-icon.active { color: var(--gold); }
 
-  .teams-container { display: flex; justify-content: space-between; align-items: center; padding: 25px 25px 15px; cursor: pointer;}
+  .teams-container { display: flex; justify-content: space-between; align-items: center; padding: 25px 25px 15px; }
   .team { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 40%; }
   .team-logo { width: 55px; height: 55px; border-radius: 50%; background: linear-gradient(135deg, var(--dark-btn), var(--card-bg)); display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 18px; color: var(--gold); border: 2px solid var(--gold); box-shadow: 0 4px 10px rgba(0,0,0,0.3);}
   .team-name { font-size: 12px; font-weight: 700; text-align: center; }
@@ -71,9 +73,10 @@
   .prediction-btn.selected .icon-box { background: #000; color: var(--green); }
   .prob-bg { position: absolute; top: 0; left: 0; bottom: 0; background: rgba(255, 193, 7, 0.2); z-index: 0; transition: width 0.5s; }
 
-  /* VIP LOCK */
+  /* VIP LOCK & MESSAGE ERREUR */
   .vip-lock { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(3px); display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--gold); font-size: 13px; font-weight: 800; z-index: 10; border-radius: 8px; text-align: center;}
   .vip-lock span { font-size: 20px; margin-bottom: 5px;}
+  .no-data-msg { text-align: center; font-size: 12px; color: var(--text-muted); padding: 15px; background: rgba(128,128,128,0.1); border-radius: 8px;}
 
   .select-wrapper { padding: 10px 15px; text-align: center; background: var(--card-bg); }
   select { background: var(--dark-btn); color: var(--text-main); border: 1px solid var(--text-muted); padding: 10px 20px; border-radius: 8px; font-size: 13px; outline: none; width: 100%; max-width: 300px; font-weight: 600;}
@@ -89,7 +92,7 @@
   .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--text-muted); padding-bottom: 10px;}
   .close-modal { background: var(--red); color: white; border: none; padding: 5px 10px; border-radius: 5px; font-weight: bold; cursor: pointer;}
   .modal-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color); font-size: 14px;}
-  
+
   #toast-container { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 100; display: flex; flex-direction: column; gap: 10px; pointer-events: none;}
   .toast { background: var(--green); color: #000; padding: 10px 20px; border-radius: 30px; font-weight: 800; font-size: 13px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); animation: slideDown 0.3s forwards, fadeOut 0.3s 2.5s forwards;}
   @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -110,7 +113,10 @@
 
   <div class="header">
     <h1>YAHIKO PRONOS</h1>
-    <div id="vipStatusBtn" class="vip-badge" onclick="ouvrirPaywall()">👑 Devenir VIP</div>
+    <div class="header-actions">
+        <button class="theme-btn" onclick="toggleTheme()">🌓</button>
+        <div id="vipStatusBtn" class="vip-badge" onclick="ouvrirPaywall()">👑 VIP</div>
+    </div>
   </div>
 
   <div class="search-bar">
@@ -120,107 +126,102 @@
   <div id="view-home" class="view active">
     
     <div id="promoBanner" class="vip-banner">
-        <h3>Passez au niveau supérieur !</h3>
-        <p>Débloquez les scores exacts et les paris mi-temps/fin.</p>
+        <h3>Abonnez-vous pour voir les cotes exclusives !</h3>
+        <p>Débloquez les marchés avancés (BTTS, Score Exact).</p>
         <button class="btn-vip" onclick="ouvrirPaywall()">Devenir Membre VIP (5 000 CFA)</button>
     </div>
 
-    <!-- NOUVEAUX MARCHÉS -->
+    <!-- MARCHÉS RÉELS UNIQUEMENT -->
     <div class="filters-container">
       <div class="markets-bar">
         <button class="market-btn active" onclick="changerMarche('1X2', this)">🏆 1X2</button>
-        <button class="market-btn" onclick="changerMarche('COMBO', this)">🔥 Gagnant & Buts</button>
-        <button class="market-btn" onclick="changerMarche('BTTS_COMBO', this)">🥅 BTTS & Buts</button>
         <button class="market-btn" onclick="changerMarche('DC', this)">🛡️ Double Chance</button>
         <button class="market-btn" onclick="changerMarche('OU', this)">📈 Buts (O/U)</button>
-        <button class="market-btn" onclick="changerMarche('SCORE', this)">🎯 Score Exact VIP</button>
+        <button class="market-btn" onclick="changerMarche('COMBO', this)">🔥 Gagnant & Buts</button>
+        <button class="market-btn" onclick="changerMarche('BTTS', this)">🥅 BTTS</button>
       </div>
     </div>
 
     <div class="select-wrapper">
       <select id="leagueSelect" onchange="chargerMatchs()">
-        <div class="select-wrapper">
-  <select id="leagueSelect" onchange="chargerMatchs()">
-    
-    <optgroup label="⭐ Top 5 Européens">
-      <option value="soccer_epl">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League</option>
-      <option value="soccer_france_ligue_one">🇫🇷 Ligue 1</option>
-      <option value="soccer_spain_la_liga">🇪🇸 La Liga</option>
-      <option value="soccer_italy_serie_a">🇮🇹 Serie A</option>
-      <option value="soccer_germany_bundesliga">🇩🇪 Bundesliga</option>
-    </optgroup>
+        
+        <optgroup label="⭐ Top 5 Européens">
+          <option value="soccer_epl">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League</option>
+          <option value="soccer_france_ligue_one">🇫🇷 Ligue 1</option>
+          <option value="soccer_spain_la_liga">🇪🇸 La Liga</option>
+          <option value="soccer_italy_serie_a">🇮🇹 Serie A</option>
+          <option value="soccer_germany_bundesliga">🇩🇪 Bundesliga</option>
+        </optgroup>
 
-    <optgroup label="🏆 Coupes Nationales (Top 5)">
-      <option value="soccer_england_fa_cup">🏴󠁧󠁢󠁥󠁮󠁧󠁿 FA Cup (Ang)</option>
-      <option value="soccer_france_coupe_de_france">🇫🇷 Coupe de France</option>
-      <option value="soccer_spain_copa_del_rey">🇪🇸 Copa del Rey</option>
-      <option value="soccer_italy_coppa_italia">🇮🇹 Coppa Italia</option>
-      <option value="soccer_germany_dfb_pokal">🇩🇪 DFB Pokal</option>
-    </optgroup>
+        <optgroup label="🏆 Coupes Nationales (Top 5)">
+          <option value="soccer_england_fa_cup">🏴󠁧󠁢󠁥󠁮󠁧󠁿 FA Cup (Ang)</option>
+          <option value="soccer_france_coupe_de_france">🇫🇷 Coupe de France</option>
+          <option value="soccer_spain_copa_del_rey">🇪🇸 Copa del Rey</option>
+          <option value="soccer_italy_coppa_italia">🇮🇹 Coppa Italia</option>
+          <option value="soccer_germany_dfb_pokal">🇩🇪 DFB Pokal</option>
+        </optgroup>
 
-    <optgroup label="🇪🇺 Coupes d'Europe">
-      <option value="soccer_uefa_champs_league">🏆 Ligue des Champions</option>
-      <option value="soccer_uefa_europa_league">🏆 Europa League</option>
-      <option value="soccer_uefa_europa_conference_league">🏆 Conference League</option>
-    </optgroup>
+        <optgroup label="🇪🇺 Coupes d'Europe">
+          <option value="soccer_uefa_champs_league">🏆 Ligue des Champions</option>
+          <option value="soccer_uefa_europa_league">🏆 Europa League</option>
+          <option value="soccer_uefa_europa_conference_league">🏆 Conference League</option>
+        </optgroup>
 
-    <optgroup label="🌍 Afrique">
-      <option value="soccer_africa_cup_of_nations">🌍 CAN (Coupe d'Afrique)</option>
-      <option value="soccer_caf_champions_league">🏆 Ligue des Champions CAF</option>
-      <option value="soccer_south_africa_premiership">🇿🇦 Premier Soccer League (SA)</option>
-    </optgroup>
+        <optgroup label="🌍 Afrique">
+          <option value="soccer_africa_cup_of_nations">🌍 CAN (Coupe d'Afrique)</option>
+          <option value="soccer_caf_champions_league">🏆 Ligue des Champions CAF</option>
+          <option value="soccer_south_africa_premiership">🇿🇦 Premier Soccer League (SA)</option>
+        </optgroup>
 
-    <optgroup label="🌎 Amériques">
-      <option value="soccer_brazil_campeonato">🇧🇷 Brasileirão</option>
-      <option value="soccer_argentina_primera_division">🇦🇷 Liga Profesional</option>
-      <option value="soccer_chile_campeonato">🇨🇱 Primera División (Chili)</option>
-      <option value="soccer_usa_mls">🇺🇸 MLS (USA)</option>
-      <option value="soccer_mexico_ligamx">🇲🇽 Liga MX</option>
-      <option value="soccer_conmebol_copa_libertadores">🏆 Copa Libertadores</option>
-      <option value="soccer_conmebol_copa_sudamericana">🏆 Copa Sudamericana</option>
-    </optgroup>
+        <optgroup label="🌎 Amériques">
+          <option value="soccer_brazil_campeonato">🇧🇷 Brasileirão</option>
+          <option value="soccer_argentina_primera_division">🇦🇷 Liga Profesional</option>
+          <option value="soccer_chile_campeonato">🇨🇱 Primera División (Chili)</option>
+          <option value="soccer_usa_mls">🇺🇸 MLS (USA)</option>
+          <option value="soccer_mexico_ligamx">🇲🇽 Liga MX</option>
+          <option value="soccer_conmebol_copa_libertadores">🏆 Copa Libertadores</option>
+          <option value="soccer_conmebol_copa_sudamericana">🏆 Copa Sudamericana</option>
+        </optgroup>
 
-    <optgroup label="🌏 Asie & Océanie">
-      <option value="soccer_japan_j_league">🇯🇵 J1 League (Japon)</option>
-      <option value="soccer_korea_kleague1">🇰🇷 K League 1 (Corée)</option>
-      <option value="soccer_china_superleague">🇨🇳 Super League (Chine)</option>
-      <option value="soccer_india_super_league">🇮🇳 Super League (Inde)</option>
-      <option value="soccer_australia_aleague">🇦🇺 A-League (Australie)</option>
-    </optgroup>
+        <optgroup label="🌏 Asie & Océanie">
+          <option value="soccer_japan_j_league">🇯🇵 J1 League (Japon)</option>
+          <option value="soccer_korea_kleague1">🇰🇷 K League 1 (Corée)</option>
+          <option value="soccer_china_superleague">🇨🇳 Super League (Chine)</option>
+          <option value="soccer_india_super_league">🇮🇳 Super League (Inde)</option>
+          <option value="soccer_australia_aleague">🇦🇺 A-League (Australie)</option>
+        </optgroup>
 
-    <optgroup label="🌍 Reste de l'Europe">
-      <option value="soccer_efl_champ">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Championship (Ang)</option>
-      <option value="soccer_france_ligue_two">🇫🇷 Ligue 2 (Fra)</option>
-      <option value="soccer_spain_segunda_division">🇪🇸 La Liga 2 (Esp)</option>
-      <option value="soccer_germany_bundesliga2">🇩🇪 2. Bundesliga (All)</option>
-      <option value="soccer_portugal_primeira_liga">🇵🇹 Liga Portugal</option>
-      <option value="soccer_netherlands_eredivisie">🇳🇱 Eredivisie</option>
-      <option value="soccer_turkey_super_league">🇹🇷 Süper Lig</option>
-      <option value="soccer_belgium_first_div">🇧🇪 Pro League</option>
-      <option value="soccer_scotland_premiership">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scottish Premiership (Écosse)</option>
-      <option value="soccer_greece_super_league">🇬🇷 Super League (Grèce)</option>
-      <option value="soccer_switzerland_superleague">🇨🇭 Super League (Suisse)</option>
-      <option value="soccer_austria_bundesliga">🇦🇹 Bundesliga (Autriche)</option>
-      <option value="soccer_denmark_superliga">🇩🇰 Superliga (Danemark)</option>
-      <option value="soccer_sweden_allsvenskan">🇸🇪 Allsvenskan (Suède)</option>
-      <option value="soccer_norway_eliteserien">🇳🇴 Eliteserien (Norvège)</option>
-      <option value="soccer_russia_premier_league">🇷🇺 Premier League (Russie)</option>
-    </optgroup>
+        <optgroup label="🌍 Reste de l'Europe">
+          <option value="soccer_efl_champ">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Championship (Ang)</option>
+          <option value="soccer_france_ligue_two">🇫🇷 Ligue 2 (Fra)</option>
+          <option value="soccer_spain_segunda_division">🇪🇸 La Liga 2 (Esp)</option>
+          <option value="soccer_germany_bundesliga2">🇩🇪 2. Bundesliga (All)</option>
+          <option value="soccer_portugal_primeira_liga">🇵🇹 Liga Portugal</option>
+          <option value="soccer_netherlands_eredivisie">🇳🇱 Eredivisie</option>
+          <option value="soccer_turkey_super_league">🇹🇷 Süper Lig</option>
+          <option value="soccer_belgium_first_div">🇧🇪 Pro League</option>
+          <option value="soccer_scotland_premiership">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scottish Premiership (Écosse)</option>
+          <option value="soccer_greece_super_league">🇬🇷 Super League (Grèce)</option>
+          <option value="soccer_switzerland_superleague">🇨🇭 Super League (Suisse)</option>
+          <option value="soccer_austria_bundesliga">🇦🇹 Bundesliga (Autriche)</option>
+          <option value="soccer_denmark_superliga">🇩🇰 Superliga (Danemark)</option>
+          <option value="soccer_sweden_allsvenskan">🇸🇪 Allsvenskan (Suède)</option>
+          <option value="soccer_norway_eliteserien">🇳🇴 Eliteserien (Norvège)</option>
+          <option value="soccer_russia_premier_league">🇷🇺 Premier League (Russie)</option>
+        </optgroup>
 
-    <optgroup label="🏆 Compétitions Internationales">
-      <option value="soccer_fifa_world_cup">🌍 Coupe du Monde</option>
-      <option value="soccer_fifa_club_world_cup">🏆 Coupe du Monde des Clubs</option>
-      <option value="soccer_uefa_euro_championship">🇪🇺 Euro (Europe)</option>
-      <option value="soccer_copa_america">🌎 Copa America</option>
-    </optgroup>
+        <optgroup label="🏆 Compétitions Internationales">
+          <option value="soccer_fifa_world_cup">🌍 Coupe du Monde</option>
+          <option value="soccer_fifa_club_world_cup">🏆 Coupe du Monde des Clubs</option>
+          <option value="soccer_uefa_euro_championship">🇪🇺 Euro (Europe)</option>
+          <option value="soccer_copa_america">🌎 Copa America</option>
+        </optgroup>
 
-  </select>
-</div>
       </select>
     </div>
 
     <div class="container" id="list">
-      <div class="loading">Analyse de l'IA... ⏳</div>
+      <div class="loading">Récupération des vraies données... ⏳</div>
     </div>
   </div>
 
@@ -240,6 +241,8 @@
           <h3 id="profilStatut">Compte Gratuit</h3>
           <p style="font-size:12px; color:var(--text-muted); margin-top:5px;">Passez VIP pour débloquer tous les marchés.</p>
       </div>
+
+      <button class="btn-vip" style="background:var(--blue); color:white; margin-bottom:20px;" onclick="copierParrainage()">🎁 Inviter un ami</button>
 
       <h3 style="color:var(--text-main); margin-bottom:10px;">📜 Historique (Simulation)</h3>
       <div id="historiqueList" class="container" style="padding:0;"></div>
@@ -277,8 +280,16 @@ let isPremium = localStorage.getItem('yahikoPremium') === 'true';
 let favoris = JSON.parse(localStorage.getItem('yahikoFavoris')) || [];
 let panier = JSON.parse(localStorage.getItem('yahikoPanier')) || [];
 let historique = JSON.parse(localStorage.getItem('yahikoHistorique')) || [];
+let isLightMode = localStorage.getItem('yahikoTheme') === 'light';
 
+if(isLightMode) document.body.classList.add('light-mode');
 majStatutVIP();
+
+function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    isLightMode = document.body.classList.contains('light-mode');
+    localStorage.setItem('yahikoTheme', isLightMode ? 'light' : 'dark');
+}
 
 function majStatutVIP() {
     const btn = document.getElementById('vipStatusBtn');
@@ -286,14 +297,12 @@ function majStatutVIP() {
     const profilStatut = document.getElementById('profilStatut');
 
     if(isPremium) {
-        btn.innerHTML = "👑 Membre VIP";
-        btn.style.background = "var(--gold)";
+        btn.innerHTML = "👑 VIP";
         if(banner) banner.style.display = 'none';
         profilStatut.innerText = "Compte VIP Actif";
         profilStatut.style.color = "var(--gold)";
     } else {
-        btn.innerHTML = "👑 Devenir VIP";
-        btn.style.background = "linear-gradient(45deg, #ffd700, #ff8c00)";
+        btn.innerHTML = "👑 VIP";
         if(banner) banner.style.display = 'block';
         profilStatut.innerText = "Compte Gratuit";
     }
@@ -301,20 +310,18 @@ function majStatutVIP() {
 
 function ouvrirPaywall() {
     if(isPremium) { showToast("Vous êtes déjà VIP ! 👑"); return; }
-
     const content = document.getElementById('modalContent');
     content.innerHTML = `
         <div class="modal-header"><h3>👑 Devenir Membre VIP</h3><button class="close-modal" onclick="fermerModal()">X</button></div>
         <div style="text-align:center; padding:10px 0;">
             <p style="font-size:14px; margin-bottom:20px;">Débloquez la puissance de l'IA sans limites.</p>
             <div style="text-align:left; background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; margin-bottom:20px;">
-                <div class="vip-feature"><span>🎯</span> Score Exact (L'IA calcule les probabilités)</div>
-                <div class="vip-feature"><span>⏱️</span> Mi-temps / Fin de match</div>
-                <div class="vip-feature"><span>🥅</span> BTTS & Buts</div>
+                <div class="vip-feature"><span>🥅</span> Marché BTTS (Si disponible)</div>
+                <div class="vip-feature"><span>🔥</span> Combos Gagnant & Buts</div>
+                <div class="vip-feature"><span>🚫</span> Navigation 100% sans publicité</div>
             </div>
             <div style="font-size:24px; font-weight:800; color:var(--gold); margin-bottom:20px;">5 000 CFA / mois</div>
             <button class="btn-vip" onclick="simulerPaiement()">Payer et Devenir VIP</button>
-            <p style="font-size:10px; color:var(--text-muted); margin-top:10px;">Paiement sécurisé (Simulation)</p>
         </div>
     `;
     document.getElementById('modalOverlay').classList.add('active');
@@ -329,6 +336,13 @@ function simulerPaiement() {
         showToast("🎉 Bienvenue dans le club VIP !");
         afficherDonnees(); 
     }, 1000);
+}
+
+function copierParrainage() {
+    let texte = "🔥 Rejoins-moi sur Yahiko Pronos, l'IA des pronos foot ! : " + window.location.href;
+    navigator.clipboard.writeText(texte).then(() => {
+        showToast("🎁 Lien copié ! Envoie-le à tes amis.");
+    });
 }
 
 function showToast(message) {
@@ -364,9 +378,11 @@ function changerMarche(marche, btn) {
 function chargerMatchs() {
   const list = document.getElementById('list');
   const league = document.getElementById('leagueSelect').value;
-  list.innerHTML = '<div class="loading">Analyse de l\'IA... ⏳</div>';
+  list.innerHTML = '<div class="loading">Récupération des vraies données... ⏳</div>';
 
-  const API_URL = `/api/v4/sports/${league}/odds/?apiKey=${API_KEY}&regions=eu&markets=h2h,totals`;
+  // LE PROXY POUR GITHUB PAGES (Contourne le blocage CORS)
+  const TARGET_URL = `https://api.the-odds-api.com/v4/sports/${league}/odds/?apiKey=${API_KEY}&regions=eu&markets=h2h,totals`;
+  const API_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(TARGET_URL)}`;
 
   fetch(API_URL)
   .then(reponse => reponse.json())
@@ -376,15 +392,8 @@ function chargerMatchs() {
     afficherDonnees();
   })
   .catch(erreur => {
-    list.innerHTML = `<div class="loading" style="color:var(--red);">❌ Erreur de connexion.</div>`;
+    list.innerHTML = `<div class="loading" style="color:var(--red);">❌ Erreur de connexion à l'API.</div>`;
   });
-}
-
-// Génère une cote réaliste avec un pourcentage de probabilité
-function genererCoteAvecProba(minCote, maxCote) {
-    const cote = (minCote + Math.random() * (maxCote - minCote)).toFixed(2);
-    const proba = ((1 / cote) * 100).toFixed(0);
-    return { cote, proba };
 }
 
 function afficherDonnees() {
@@ -424,39 +433,6 @@ function afficherDonnees() {
         });
     }
 
-    // --- BTTS & BUTS (Nouveau) ---
-    if (marcheActif === 'BTTS_COMBO') {
-        if(!isPremium) {
-            predictionsHtml += `<div class="prediction-btn" style="border-color:var(--gold);"><div class="vip-lock" onclick="ouvrirPaywall()"><span>🔒</span> Réservé aux VIP<br>Débloquez les cotes BTTS</div></div>`;
-        } else {
-            // Génération de probabilités réalistes
-            let btts15 = genererCoteAvecProba(1.30, 1.55); // Ex: Cote 1.40 -> 71%
-            let btts25 = genererCoteAvecProba(1.70, 2.10); // Ex: Cote 1.90 -> 52%
-            let bttsNon25 = genererCoteAvecProba(1.80, 2.30); // Ex: Cote 2.10 -> 47%
-
-            predictionsHtml += `<button class="prediction-btn" onclick="ajouterAuPanier('${match.id}-B15', 'BTTS Oui & +1.5', ${btts15.cote}, '${match.home_team} vs ${match.away_team}', this)"><div class="prob-bg" style="width: ${btts15.proba}%;"></div><div class="label"><span class="icon-box">BTTS</span> Les 2 marquent & +1.5 buts</div><span>${btts15.proba}%</span></button>`;
-            
-            predictionsHtml += `<button class="prediction-btn" onclick="ajouterAuPanier('${match.id}-B25', 'BTTS Oui & +2.5', ${btts25.cote}, '${match.home_team} vs ${match.away_team}', this)"><div class="prob-bg" style="width: ${btts25.proba}%;"></div><div class="label"><span class="icon-box">BTTS</span> Les 2 marquent & +2.5 buts</div><span>${btts25.proba}%</span></button>`;
-
-            predictionsHtml += `<button class="prediction-btn" onclick="ajouterAuPanier('${match.id}-BN25', 'BTTS Non & -2.5', ${bttsNon25.cote}, '${match.home_team} vs ${match.away_team}', this)"><div class="prob-bg" style="width: ${bttsNon25.proba}%; background: rgba(239, 68, 68, 0.2);"></div><div class="label"><span class="icon-box" style="background:var(--red); color:white;">BTTS</span> Les 2 ne marquent pas & -2.5</div><span>${bttsNon25.proba}%</span></button>`;
-        }
-    }
-
-    // --- GAGNANT & BUTS (Déjà ajouté précédemment) ---
-    if (marcheActif === 'COMBO' && h2h) {
-        const home = h2h.outcomes.find(o => o.name === match.home_team);
-        const away = h2h.outcomes.find(o => o.name === match.away_team);
-        if (home && away) {
-            let c1 = (home.price * 1.25).toFixed(2); let p1 = ((1/c1)*100).toFixed(0);
-            let c2 = (home.price * 1.65).toFixed(2); let p2 = ((1/c2)*100).toFixed(0);
-            let c3 = (away.price * 1.25).toFixed(2); let p3 = ((1/c3)*100).toFixed(0);
-            
-            predictionsHtml += `<button class="prediction-btn" onclick="ajouterAuPanier('${match.id}-C1', '${match.home_team} & +1.5', ${c1}, '${match.home_team} vs ${match.away_team}', this)"><div class="prob-bg" style="width: ${p1}%;"></div><div class="label"><span class="icon-box">COMBO</span> ${match.home_team} & +1.5</div><span>${p1}%</span></button>`;
-            predictionsHtml += `<button class="prediction-btn" onclick="ajouterAuPanier('${match.id}-C2', '${match.home_team} & +2.5', ${c2}, '${match.home_team} vs ${match.away_team}', this)"><div class="prob-bg" style="width: ${p2}%;"></div><div class="label"><span class="icon-box">COMBO</span> ${match.home_team} & +2.5</div><span>${p2}%</span></button>`;
-            predictionsHtml += `<button class="prediction-btn" onclick="ajouterAuPanier('${match.id}-C3', '${match.away_team} & +1.5', ${c3}, '${match.home_team} vs ${match.away_team}', this)"><div class="prob-bg" style="width: ${p3}%;"></div><div class="label"><span class="icon-box">COMBO</span> ${match.away_team} & +1.5</div><span>${p3}%</span></button>`;
-        }
-    }
-
     // --- DOUBLE CHANCE ---
     if (marcheActif === 'DC' && h2h && h2h.outcomes.length === 3) {
         const home = h2h.outcomes.find(o => o.name === match.home_team);
@@ -483,15 +459,33 @@ function afficherDonnees() {
         });
     }
 
-    // --- SCORE EXACT VIP ---
-    if (marcheActif === 'SCORE' && h2h) {
+    // --- COMBO GAGNANT & BUTS ---
+    if (marcheActif === 'COMBO' && h2h && totals) {
+        const home = h2h.outcomes.find(o => o.name === match.home_team);
+        const away = h2h.outcomes.find(o => o.name === match.away_team);
+        const over25 = totals.outcomes.find(o => o.name === 'Over' && o.point === 2.5);
+        
+        if (home && over25) {
+            let c1 = (home.price * over25.price).toFixed(2);
+            let p1 = ((1/c1)*100).toFixed(0);
+            predictionsHtml += `<button class="prediction-btn" onclick="ajouterAuPanier('${match.id}-C1', '${match.home_team} & +2.5', ${c1}, '${match.home_team} vs ${match.away_team}', this)"><div class="prob-bg" style="width: ${p1}%;"></div><div class="label"><span class="icon-box">COMBO</span> ${match.home_team} & +2.5</div><span>${p1}%</span></button>`;
+        }
+        if (away && over25) {
+            let c2 = (away.price * over25.price).toFixed(2);
+            let p2 = ((1/c2)*100).toFixed(0);
+            predictionsHtml += `<button class="prediction-btn" onclick="ajouterAuPanier('${match.id}-C2', '${match.away_team} & +2.5', ${c2}, '${match.home_team} vs ${match.away_team}', this)"><div class="prob-bg" style="width: ${p2}%;"></div><div class="label"><span class="icon-box">COMBO</span> ${match.away_team} & +2.5</div><span>${p2}%</span></button>`;
+        }
+        if (predictionsHtml === '') {
+            predictionsHtml += `<div class="no-data-msg">Les cotes combinées ne sont pas disponibles pour ce match.</div>`;
+        }
+    }
+
+    // --- BTTS ---
+    if (marcheActif === 'BTTS') {
         if(!isPremium) {
-            predictionsHtml += `<div class="prediction-btn" style="border-color:var(--gold);"><div class="vip-lock" onclick="ouvrirPaywall()"><span>🔒</span> L'IA a trouvé le score exact.<br>Devenez VIP.</div></div>`;
+            predictionsHtml += `<div class="prediction-btn" style="border-color:var(--gold);"><div class="vip-lock" onclick="ouvrirPaywall()"><span>🔒</span> Réservé aux VIP<br>Marché BTTS</div></div>`;
         } else {
-            let score1 = genererCoteAvecProba(6.0, 9.0);
-            let score2 = genererCoteAvecProba(8.0, 12.0);
-            predictionsHtml += `<button class="prediction-btn" onclick="ajouterAuPanier('${match.id}-S1', 'Score 1-0 / 2-1', ${score1.cote}, '${match.home_team} vs ${match.away_team}', this)"><div class="prob-bg" style="width: ${score1.proba}%;"></div><div class="label"><span class="icon-box">EXACT</span> Score Exact : 1-0 ou 2-1</div><span>${score1.proba}%</span></button>`;
-            predictionsHtml += `<button class="prediction-btn" onclick="ajouterAuPanier('${match.id}-S2', 'Score 1-1 / 0-1', ${score2.cote}, '${match.home_team} vs ${match.away_team}', this)"><div class="prob-bg" style="width: ${score2.proba}%;"></div><div class="label"><span class="icon-box">EXACT</span> Score Exact : 1-1 ou 0-1</div><span>${score2.proba}%</span></button>`;
+            predictionsHtml += `<div class="no-data-msg">Désolé, les bookmakers partenaires ne fournissent pas la cote BTTS pour ce match spécifique sur l'API gratuite.</div>`;
         }
     }
 
@@ -506,7 +500,7 @@ function afficherDonnees() {
             <div class="competition-name">${match.sport_title}</div>
             <div class="match-time">⏰ ${heure}</div>
           </div>
-          <div class="teams-container" onclick="ouvrirDetails('${match.id}')">
+          <div class="teams-container">
             <div class="team"><div class="team-logo">${homeInit}</div><div class="team-name">${match.home_team}</div></div>
             <div class="vs-circle">VS</div>
             <div class="team"><div class="team-logo">${awayInit}</div><div class="team-name">${match.away_team}</div></div>
@@ -519,31 +513,11 @@ function afficherDonnees() {
   }
 
   if (matchsAffiches === 0) {
-      html = '<div class="loading">Aucun pronostic trouvé pour ce marché.</div>';
+      html = '<div class="loading">Aucun match trouvé pour ce marché.</div>';
   }
   
   list.innerHTML = html;
   mettreAJourEtatPanierBoutons();
-}
-
-function ouvrirDetails(matchId) {
-    if(!isPremium) { ouvrirPaywall(); return; }
-    const match = donneesGlobales.find(m => m.id === matchId);
-    if(!match) return;
-    const bookmaker = match.bookmakers[0];
-    const h2h = bookmaker.markets.find(m => m.key === 'h2h');
-    
-    let html = `<div class="modal-header"><h3>📊 Analyse VIP</h3><button class="close-modal" onclick="fermerModal()">X</button></div>`;
-    html += `<div style="text-align:center; margin-bottom:15px;"><h4 style="color:var(--gold);">${match.home_team} vs ${match.away_team}</h4></div>`;
-    html += `<div class="modal-row" style="border:none; font-size:12px; color:var(--blue);"><span>🤖 Statistiques de l'IA :</span><span>Forme : 3V - 1N - 1D</span></div>`;
-    if(h2h) {
-        h2h.outcomes.forEach(o => {
-            const proba = ((1 / o.price) * 100).toFixed(0);
-            html += `<div class="modal-row"><span>${o.name}</span><span style="color:var(--gold);">${proba}% de chances</span></div>`;
-        });
-    }
-    document.getElementById('modalContent').innerHTML = html;
-    document.getElementById('modalOverlay').classList.add('active');
 }
 
 // PANIER
