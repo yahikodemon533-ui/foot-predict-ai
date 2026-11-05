@@ -273,7 +273,7 @@ function chargerMatchs() {
 
   // PROXY CODETABS (Ultra fiable pour GitHub Pages)
   const TARGET_URL = `https://api.the-odds-api.com/v4/sports/${league}/odds/?apiKey=${API_KEY}&regions=eu&markets=h2h,totals`;
-  const API_URL = `https://api.codetabs.com/v1/proxy?quest=${TARGET_URL}`;
+  const API_URL = `https://yahikozn.yahikodemon533.workers.dev/?url=${encodeURIComponent(TARGET_URL)}`;
 
   fetch(API_URL)
   .then(reponse => reponse.json())
