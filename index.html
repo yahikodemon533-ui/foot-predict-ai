@@ -271,9 +271,9 @@ function chargerMatchs() {
   const league = document.getElementById('leagueSelect').value;
   list.innerHTML = '<div class="loading">Récupération des vraies données... ⏳</div>';
 
-  // PROXY CODETABS (Ultra fiable pour GitHub Pages)
+  // NOUVEAU PROXY ULTRA-FIABLE (sans besoin d'en-têtes personnalisés)
   const TARGET_URL = `https://api.the-odds-api.com/v4/sports/${league}/odds/?apiKey=${API_KEY}&regions=eu&markets=h2h,totals`;
-  const API_URL = `https://yahikozn.yahikodemon533.workers.dev/?url=${encodeURIComponent(TARGET_URL)}`;
+  const API_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(TARGET_URL)}`;
 
   fetch(API_URL)
   .then(reponse => reponse.json())
