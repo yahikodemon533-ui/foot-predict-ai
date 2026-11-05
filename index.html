@@ -266,6 +266,274 @@ function changerMarche(marche, btn) {
   afficherDonnees();
 }
 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Yahiko Pronos - 100% Réel</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #11001C; --card-bg: #1c1c1e; --text-main: #ffffff;
+    --text-muted: #a1a1aa; --gold: #ffc107; --green: #4ade80; --dark-btn: #2c2c2e;
+    --red: #ef4444; --blue: #3b82f6; --border-color: rgba(255,255,255,0.1);
+  }
+  body.light-mode {
+    --bg-color: #f3f4f6; --card-bg: #ffffff; --text-main: #1f2937;
+    --text-muted: #6b7280; --dark-btn: #e5e7eb; --border-color: rgba(0,0,0,0.1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Montserrat', sans-serif; background: var(--bg-color); color: var(--text-main); padding-bottom: 150px; transition: background 0.3s; }
+  .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: var(--bg-color); position: sticky; top: 0; z-index: 10;}
+  .header h1 { font-size: 18px; color: var(--gold); font-weight: 800;}
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+  .theme-btn { background: var(--dark-btn); color: var(--text-main); border: none; padding: 8px; border-radius: 50%; cursor: pointer; font-size: 16px; }
+  .vip-badge { background: linear-gradient(45deg, #ffd700, #ff8c00); color: #000; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; cursor: pointer;}
+  .vip-banner { background: linear-gradient(90deg, #8b5cf6, #3b82f6); color: white; padding: 15px; text-align: center; margin: 10px 15px; border-radius: 12px; }
+  .vip-banner h3 { font-size: 16px; margin-bottom: 5px; }
+  .vip-banner p { font-size: 12px; margin-bottom: 10px; }
+  .btn-vip { background: var(--gold); color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 800; font-size: 14px; cursor: pointer; width: 100%;}
+  .search-bar { padding: 10px 15px 0; background: var(--bg-color); position: sticky; top: 55px; z-index: 9;}
+  .search-bar input { width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--text-muted); background: var(--card-bg); color: var(--text-main); outline: none;}
+  .view { display: none; } 
+  .view.active { display: block; } 
+  .filters-container { background: var(--card-bg); padding-bottom: 10px; border-bottom: 2px solid var(--gold); margin-top: 5px;}
+  .markets-bar { display: flex; padding: 10px 15px; gap: 10px; overflow-x: auto; scrollbar-width: none;}
+  .markets-bar::-webkit-scrollbar { display: none; }
+  .market-btn { background: var(--dark-btn); color: var(--text-muted); border: none; padding: 8px 15px; border-radius: 8px; font-weight: 700; font-size: 12px; white-space: nowrap; cursor: pointer;}
+  .market-btn.active { background: var(--gold); color: #000; }
+  .container { padding: 15px; display: flex; flex-direction: column; gap: 15px; }
+  .match-card { background: var(--card-bg); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.2); position: relative; border: 1px solid var(--border-color);}
+  .card-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: rgba(128, 128, 128, 0.05); border-bottom: 1px solid var(--border-color); }
+  .competition-name { background: var(--gold); color: #000; font-size: 11px; font-weight: 800; padding: 5px 10px; border-radius: 6px; text-transform: uppercase;}
+  .match-time { background: var(--text-main); color: var(--bg-color); font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 6px;}
+  .star-icon { position: absolute; top: 15px; right: 15px; font-size: 20px; cursor: pointer; z-index: 5; color: var(--text-muted);}
+  .star-icon.active { color: var(--gold); }
+  .teams-container { display: flex; justify-content: space-between; align-items: center; padding: 25px 25px 15px; }
+  .team { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 40%; }
+  .team-logo { width: 55px; height: 55px; border-radius: 50%; background: linear-gradient(135deg, var(--dark-btn), var(--card-bg)); display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 18px; color: var(--gold); border: 2px solid var(--gold);}
+  .team-name { font-size: 12px; font-weight: 700; text-align: center; }
+  .vs-circle { width: 35px; height: 35px; border-radius: 50%; background: var(--text-main); display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: 800; color: var(--bg-color); border: 2px solid var(--gold);}
+  .predictions-container { padding: 0 15px 15px; display: flex; flex-direction: column; gap: 8px;}
+  .prediction-btn { position: relative; overflow: hidden; background: rgba(255, 193, 7, 0.1); border: 1px solid var(--gold); color: var(--gold); width: 100%; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; cursor: pointer;}
+  .prediction-btn.selected { background: var(--green); border-color: var(--green); color: #000; }
+  .prediction-btn .label { display: flex; align-items: center; gap: 8px; z-index: 2; text-align: left;}
+  .prediction-btn .icon-box { background: var(--gold); color: #000; padding: 4px 6px; border-radius: 4px; font-size: 10px; z-index: 2;}
+  .prob-bg { position: absolute; top: 0; left: 0; bottom: 0; background: rgba(255, 193, 7, 0.2); z-index: 0; }
+  .vip-lock { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--gold); font-size: 13px; font-weight: 800; z-index: 10; border-radius: 8px; text-align: center;}
+  .no-data-msg { text-align: center; font-size: 12px; color: var(--text-muted); padding: 15px; background: rgba(128,128,128,0.1); border-radius: 8px;}
+  .select-wrapper { padding: 10px 15px; text-align: center; background: var(--card-bg); }
+  select { background: var(--dark-btn); color: var(--text-main); border: 1px solid var(--text-muted); padding: 10px 20px; border-radius: 8px; font-size: 13px; outline: none; width: 100%; max-width: 300px; font-weight: 600;}
+  .loading { text-align: center; padding: 30px; color: var(--gold); font-weight: 700; font-size: 14px;}
+  .bet-slip-bar { position: fixed; bottom: 70px; left: 15px; right: 15px; background: var(--green); color: #000; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; transform: translateY(100px); transition: 0.3s; z-index: 20; cursor: pointer;}
+  .bet-slip-bar.show { transform: translateY(0); }
+  .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 50; display: none; justify-content: center; align-items: flex-end; }
+  .modal-overlay.active { display: flex; }
+  .modal-content { background: var(--card-bg); width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px; max-height: 85vh; overflow-y: auto; border: 1px solid var(--border-color);}
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--text-muted); padding-bottom: 10px;}
+  .close-modal { background: var(--red); color: white; border: none; padding: 5px 10px; border-radius: 5px; font-weight: bold; cursor: pointer;}
+  .modal-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color); font-size: 14px;}
+  #toast-container { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 100; display: flex; flex-direction: column; gap: 10px; pointer-events: none;}
+  .toast { background: var(--green); color: #000; padding: 10px 20px; border-radius: 30px; font-weight: 800; font-size: 13px; animation: slideDown 0.3s forwards, fadeOut 0.3s 2.5s forwards;}
+  @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-color); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 12px 0 20px; z-index: 10;}
+  .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: var(--text-muted); gap: 5px; font-weight: 600; cursor: pointer;}
+  .nav-item.active { color: var(--gold); }
+  .nav-icon { font-size: 20px; }
+  .vip-feature { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; font-size: 14px;}
+  .vip-feature span { font-size: 20px; }
+</style>
+</head>
+<body>
+  <div id="toast-container"></div>
+  <div class="header">
+    <h1>YAHIKO PRONOS</h1>
+    <div class="header-actions">
+        <button class="theme-btn" onclick="toggleTheme()">🌓</button>
+        <div id="vipStatusBtn" class="vip-badge" onclick="ouvrirPaywall()">👑 VIP</div>
+    </div>
+  </div>
+  <div class="search-bar">
+    <input type="text" id="searchInput" oninput="filtrerRecherche()" placeholder="🔍 Rechercher une équipe...">
+  </div>
+  <div id="view-home" class="view active">
+    <div id="promoBanner" class="vip-banner">
+        <h3>Abonnez-vous pour voir les cotes exclusives !</h3>
+        <p>Débloquez les marchés avancés (BTTS, Score Exact).</p>
+        <button class="btn-vip" onclick="ouvrirPaywall()">Devenir Membre VIP (5 000 CFA)</button>
+    </div>
+    <div class="filters-container">
+      <div class="markets-bar">
+        <button class="market-btn active" onclick="changerMarche('1X2', this)">🏆 1X2</button>
+        <button class="market-btn" onclick="changerMarche('DC', this)">🛡️ Double Chance</button>
+        <button class="market-btn" onclick="changerMarche('OU', this)">📈 Buts (O/U)</button>
+        <button class="market-btn" onclick="changerMarche('COMBO', this)">🔥 Gagnant & Buts</button>
+        <button class="market-btn" onclick="changerMarche('BTTS', this)">🥅 BTTS</button>
+      </div>
+    </div>
+    <div class="select-wrapper">
+      <select id="leagueSelect" onchange="chargerMatchs()">
+        <optgroup label="⭐ Top 5 Européens">
+          <option value="soccer_epl">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League</option>
+          <option value="soccer_france_ligue_one">🇫🇷 Ligue 1</option>
+          <option value="soccer_spain_la_liga">🇪🇸 La Liga</option>
+          <option value="soccer_italy_serie_a">🇮🇹 Serie A</option>
+          <option value="soccer_germany_bundesliga">🇩🇪 Bundesliga</option>
+        </optgroup>
+        <optgroup label="🇪🇺 Coupes d'Europe">
+          <option value="soccer_uefa_champs_league">🏆 Ligue des Champions</option>
+          <option value="soccer_uefa_europa_league">🏆 Europa League</option>
+        </optgroup>
+        <optgroup label="🌍 Afrique">
+          <option value="soccer_africa_cup_of_nations">🌍 CAN</option>
+        </optgroup>
+        <optgroup label="🌎 Amériques & Asie">
+          <option value="soccer_brazil_campeonato">🇧🇷 Brasileirão</option>
+          <option value="soccer_usa_mls">🇺🇸 MLS (USA)</option>
+          <option value="soccer_japan_j_league">🇯🇵 J1 League (Japon)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="container" id="list">
+      <div class="loading">Récupération des vraies données... ⏳</div>
+    </div>
+  </div>
+  <div id="view-favoris" class="view">
+    <div style="padding: 20px;">
+      <h2 style="color:var(--gold); margin-bottom:20px; text-align:center;">⭐ Vos Favoris</h2>
+      <div id="favorisList" class="container" style="padding:0;"></div>
+    </div>
+  </div>
+  <div id="view-historique" class="view">
+    <div style="padding: 20px;">
+      <h2 style="color:var(--gold); margin-bottom:20px; text-align:center;">👤 Mon Profil</h2>
+      <div style="background:var(--card-bg); padding:20px; border-radius:12px; text-align:center; border:1px solid var(--gold); margin-bottom:20px;">
+          <div style="font-size:40px; margin-bottom:10px;">👑</div>
+          <h3 id="profilStatut">Compte Gratuit</h3>
+      </div>
+      <button class="btn-vip" style="background:var(--blue); color:white; margin-bottom:20px;" onclick="copierParrainage()">🎁 Inviter un ami</button>
+      <h3 style="color:var(--text-main); margin-bottom:10px;">📜 Historique</h3>
+      <div id="historiqueList" class="container" style="padding:0;"></div>
+    </div>
+  </div>
+  <div id="betSlipBar" class="bet-slip-bar" onclick="ouvrirPanier()">
+    <span>🛒 Ticket (<span id="betCount">0</span>)</span>
+    <span>Cote: <span id="betOdds">0.00</span></span>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="changerPage('home', this)"><span class="nav-icon">🏠</span> Home</div>
+    <div class="nav-item" onclick="changerPage('favoris', this)"><span class="nav-icon">⭐</span> Favoris</div>
+    <div class="nav-item" onclick="changerPage('historique', this)"><span class="nav-icon">👤</span> Profil</div>
+  </div>
+  <div id="modalOverlay" class="modal-overlay" onclick="fermerModal(event)">
+    <div class="modal-content" id="modalContent" onclick="event.stopPropagation()"></div>
+  </div>
+
+<script>
+const API_KEY = "6a2fc3437e4fde97359f8ec8e86d4dd2";
+let donneesGlobales = [];
+let marcheActif = '1X2';
+let texteRecherche = "";
+
+let isPremium = localStorage.getItem('yahikoPremium') === 'true';
+let favoris = JSON.parse(localStorage.getItem('yahikoFavoris')) || [];
+let panier = JSON.parse(localStorage.getItem('yahikoPanier')) || [];
+let historique = JSON.parse(localStorage.getItem('yahikoHistorique')) || [];
+let isLightMode = localStorage.getItem('yahikoTheme') === 'light';
+
+if(isLightMode) document.body.classList.add('light-mode');
+majStatutVIP();
+
+function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    isLightMode = document.body.classList.contains('light-mode');
+    localStorage.setItem('yahikoTheme', isLightMode ? 'light' : 'dark');
+}
+
+function majStatutVIP() {
+    const btn = document.getElementById('vipStatusBtn');
+    const banner = document.getElementById('promoBanner');
+    const profilStatut = document.getElementById('profilStatut');
+    if(isPremium) {
+        btn.innerHTML = "👑 VIP";
+        if(banner) banner.style.display = 'none';
+        profilStatut.innerText = "Compte VIP Actif";
+        profilStatut.style.color = "var(--gold)";
+    } else {
+        btn.innerHTML = "👑 VIP";
+        if(banner) banner.style.display = 'block';
+        profilStatut.innerText = "Compte Gratuit";
+    }
+}
+
+function ouvrirPaywall() {
+    if(isPremium) { showToast("Vous êtes déjà VIP ! 👑"); return; }
+    const content = document.getElementById('modalContent');
+    content.innerHTML = `
+        <div class="modal-header"><h3>👑 Devenir Membre VIP</h3><button class="close-modal" onclick="fermerModal()">X</button></div>
+        <div style="text-align:center; padding:10px 0;">
+            <p style="font-size:14px; margin-bottom:20px;">Débloquez la puissance de l'IA sans limites.</p>
+            <div style="text-align:left; background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; margin-bottom:20px;">
+                <div class="vip-feature"><span>🥅</span> Marché BTTS</div>
+                <div class="vip-feature"><span>🔥</span> Combos Gagnant & Buts</div>
+            </div>
+            <div style="font-size:24px; font-weight:800; color:var(--gold); margin-bottom:20px;">5 000 CFA / mois</div>
+            <button class="btn-vip" onclick="simulerPaiement()">Payer et Devenir VIP</button>
+        </div>
+    `;
+    document.getElementById('modalOverlay').classList.add('active');
+}
+
+function simulerPaiement() {
+    setTimeout(() => {
+        isPremium = true;
+        localStorage.setItem('yahikoPremium', 'true');
+        majStatutVIP();
+        fermerModal();
+        showToast("🎉 Bienvenue dans le club VIP !");
+        afficherDonnees(); 
+    }, 1000);
+}
+
+function copierParrainage() {
+    let texte = "🔥 Rejoins-moi sur Yahiko Pronos, l'IA des pronos foot ! : " + window.location.href;
+    navigator.clipboard.writeText(texte).then(() => {
+        showToast("🎁 Lien copié !");
+    });
+}
+
+function showToast(message) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerText = message;
+  container.appendChild(toast);
+  setTimeout(() => { toast.remove(); }, 3000);
+}
+
+function changerPage(pageId, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + pageId).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (pageId === 'favoris') afficherFavoris();
+  if (pageId === 'historique') afficherHistorique();
+}
+
+function filtrerRecherche() {
+  texteRecherche = document.getElementById('searchInput').value.toLowerCase();
+  afficherDonnees();
+}
+
+function changerMarche(marche, btn) {
+  marcheActif = marche;
+  document.querySelectorAll('.market-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  afficherDonnees();
+}
+
 function chargerMatchs() {
   const list = document.getElementById('list');
   const league = document.getElementById('leagueSelect').value;
@@ -287,6 +555,205 @@ function chargerMatchs() {
   });
 }
 
+function afficherDonnees() {
+  const list = document.getElementById('list');
+  if (!donneesGlobales || donneesGlobales.length === 0) {
+    list.innerHTML = '<div class="loading">Aucun match disponible.</div>';
+    return;
+  }
+  let html = '';
+  let matchsAffiches = 0;
+  for (let i = 0; i < donneesGlobales.length; i++) {
+    if (matchsAffiches >= 20) break; 
+    const match = donneesGlobales[i];
+    if (!match.bookmakers || match.bookmakers.length === 0) continue;
+    if (texteRecherche !== "") {
+      const texteMatch = (match.home_team + " " + match.away_team).toLowerCase();
+      if (!texteMatch.includes(texteRecherche)) continue;
+    }
+    const bookmaker = match.bookmakers[0];
+    const heure = new Date(match.commence_time).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+    const homeInit = match.home_team.substring(0, 3).toUpperCase();
+    const awayInit = match.away_team.substring(0, 3).toUpperCase();
+    let predictionsHtml = '';
+    const h2h = bookmaker.markets.find(m => m.key === 'h2h');
+    const totals = bookmaker.markets.find(m => m.key === 'totals');
+    
+    if (marcheActif === '1X2' && h2h) {
+        h2h.outcomes.forEach(o => {
+          const p = ((1 / o.price) * 100).toFixed(0);
+          predictionsHtml += `<button class="prediction-btn" onclick="ajouterAuPanier('${match.id}', '${o.name}', ${o.price}, '${match.home_team} vs ${match.away_team}', this)"><div class="prob-bg" style="width: ${p}%;"></div><div class="label"><span class="icon-box">1X2</span> ${o.name}</div><span>${p}%</span></button>`;
+        });
+    }
+    if (marcheActif === 'DC' && h2h && h2h.outcomes.length === 3) {
+        const home = h2h.outcomes.find(o => o.name === match.home_team);
+        const draw = h2h.outcomes.find(o => o.name === 'Draw');
+        const away = h2h.outcomes.find(o => o.name === match.away_team);
+        if(home && draw) {
+            const p1x = ((1/home.price + 1/draw.price)*100).toFixed(0);
+            const cote1X = (home.price*draw.price/(home.price+draw.price)).toFixed(2);
+            predictionsHtml += `<button class="prediction-btn" onclick="ajouterAuPanier('${match.id}-1X', '1X', ${cote1X}, '${match.home_team} vs ${match.away_team}', this)"><div class="prob-bg" style="width: ${p1x}%;"></div><div class="label"><span class="icon-box">DC</span> 1X (Dom ou Nul)</div> <span>${p1x}%</span></button>`;
+        }
+        if(away && draw) {
+            const px2 = ((1/away.price + 1/draw.price)*100).toFixed(0);
+            const coteX2 = (away.price*draw.price/(away.price+draw.price)).toFixed(2);
+            predictionsHtml += `<button class="prediction-btn" onclick="ajouterAuPanier('${match.id}-X2', 'X2', ${coteX2}, '${match.home_team} vs ${match.away_team}', this)"><div class="prob-bg" style="width: ${px2}%;"></div><div class="label"><span class="icon-box">DC</span> X2 (Ext ou Nul)</div> <span>${px2}%</span></button>`;
+        }
+    }
+    if (marcheActif === 'OU' && totals) {
+        totals.outcomes.forEach(o => {
+           const p = ((1 / o.price) * 100).toFixed(0);
+           let label = o.name === 'Over' ? `+ de ${o.point} buts` : `- de ${o.point} buts`;
+           predictionsHtml += `<button class="prediction-btn" onclick="ajouterAuPanier('${match.id}-${o.name}${o.point}', '${label}', ${o.price}, '${match.home_team} vs ${match.away_team}', this)"><div class="prob-bg" style="width: ${p}%;"></div><div class="label"><span class="icon-box">BUTS</span> ${label}</div> <span>${p}%</span></button>`;
+        });
+    }
+    if (marcheActif === 'COMBO' && h2h && totals) {
+        const home = h2h.outcomes.find(o => o.name === match.home_team);
+        const away = h2h.outcomes.find(o => o.name === match.away_team);
+        const over25 = totals.outcomes.find(o => o.name === 'Over' && o.point === 2.5);
+        if (home && over25) {
+            let c1 = (home.price * over25.price).toFixed(2);
+            let p1 = ((1/c1)*100).toFixed(0);
+            predictionsHtml += `<button class="prediction-btn" onclick="ajouterAuPanier('${match.id}-C1', '${match.home_team} & +2.5', ${c1}, '${match.home_team} vs ${match.away_team}', this)"><div class="prob-bg" style="width: ${p1}%;"></div><div class="label"><span class="icon-box">COMBO</span> ${match.home_team} & +2.5</div><span>${p1}%</span></button>`;
+        }
+        if (away && over25) {
+            let c2 = (away.price * over25.price).toFixed(2);
+            let p2 = ((1/c2)*100).toFixed(0);
+            predictionsHtml += `<button class="prediction-btn" onclick="ajouterAuPanier('${match.id}-C2', '${match.away_team} & +2.5', ${c2}, '${match.home_team} vs ${match.away_team}', this)"><div class="prob-bg" style="width: ${p2}%;"></div><div class="label"><span class="icon-box">COMBO</span> ${match.away_team} & +2.5</div><span>${p2}%</span></button>`;
+        }
+    }
+    if (marcheActif === 'BTTS') {
+        if(!isPremium) {
+            predictionsHtml += `<div class="prediction-btn" style="border-color:var(--gold);"><div class="vip-lock" onclick="ouvrirPaywall()"><span>🔒</span> Réservé aux VIP<br>Marché BTTS</div></div>`;
+        } else {
+            predictionsHtml += `<div class="no-data-msg">Cote BTTS non disponible pour ce match.</div>`;
+        }
+    }
+    if (predictionsHtml !== '') {
+      const isFav = favoris.includes(match.id);
+      const starClass = isFav ? 'star-icon active' : 'star-icon';
+      html += `
+        <div class="match-card">
+          <div class="${starClass}" onclick="toggleFavori('${match.id}', this)">★</div>
+          <div class="card-header">
+            <div class="competition-name">${match.sport_title}</div>
+            <div class="match-time">⏰ ${heure}</div>
+          </div>
+          <div class="teams-container">
+            <div class="team"><div class="team-logo">${homeInit}</div><div class="team-name">${match.home_team}</div></div>
+            <div class="vs-circle">VS</div>
+            <div class="team"><div class="team-logo">${awayInit}</div><div class="team-name">${match.away_team}</div></div>
+          </div>
+          <div class="predictions-container">${predictionsHtml}</div>
+        </div>
+      `;
+      matchsAffiches++;
+    }
+  }
+  if (matchsAffiches === 0) html = '<div class="loading">Aucun match trouvé.</div>';
+  list.innerHTML = html;
+  mettreAJourEtatPanierBoutons();
+}
+
+function ajouterAuPanier(id, nom, cote, matchNom, btn) {
+  const index = panier.findIndex(item => item.id === id);
+  if (index > -1) {
+    panier.splice(index, 1); btn.classList.remove('selected');
+  } else {
+    panier.push({ id, nom, cote: parseFloat(cote), matchNom }); btn.classList.add('selected');
+  }
+  localStorage.setItem('yahikoPanier', JSON.stringify(panier));
+  mettreAJourBarrePanier();
+}
+
+function mettreAJourEtatPanierBoutons() {
+  panier.forEach(item => {
+    const boutons = document.querySelectorAll('.prediction-btn');
+    boutons.forEach(btn => {
+       if(btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(item.id)) {
+           btn.classList.add('selected');
+       }
+    });
+  });
+}
+
+function mettreAJourBarrePanier() {
+  const bar = document.getElementById('betSlipBar');
+  const count = document.getElementById('betCount');
+  const oddsSpan = document.getElementById('betOdds');
+  if (panier.length > 0) {
+    bar.classList.add('show'); count.innerText = panier.length;
+    let totalOdds = panier.reduce((acc, item) => acc * item.cote, 1);
+    oddsSpan.innerText = totalOdds.toFixed(2);
+  } else { bar.classList.remove('show'); }
+}
+
+function ouvrirPanier() {
+  const modal = document.getElementById('modalOverlay'); const content = document.getElementById('modalContent');
+  if (panier.length === 0) return;
+  let html = `<div class="modal-header"><h3>🛒 Ticket</h3><button class="close-modal" onclick="fermerModal()">X</button></div>`;
+  let totalOdds = 1;
+  panier.forEach((item, index) => {
+    totalOdds *= item.cote;
+    html += `<div class="modal-row"><div><div style="font-size:12px; color:var(--text-muted);">${item.matchNom}</div><div>${item.nom}</div></div><div style="display:flex; align-items:center; gap:10px;"><span>@ ${item.cote}</span><button onclick="retirerDuPanier(${index})" style="background:var(--red); color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">X</button></div></div>`;
+  });
+  html += `<div class="modal-row" style="margin-top:15px; border:none; background:rgba(74, 222, 128, 0.1); padding:15px; border-radius:8px;"><span>Cote Totale :</span> <span style="color:var(--gold); font-size:18px;">${totalOdds.toFixed(2)}</span></div><button style="width:100%; padding:15px; background:var(--gold); border:none; border-radius:8px; font-weight:800; margin-top:15px; font-size:16px;" onclick="validerPari(${totalOdds})">Valider le ticket</button>`;
+  content.innerHTML = html; modal.classList.add('active');
+}
+
+function retirerDuPanier(index) {
+  panier.splice(index, 1); localStorage.setItem('yahikoPanier', JSON.stringify(panier));
+  mettreAJourBarrePanier();
+  if (panier.length === 0) fermerModal(); else ouvrirPanier(); 
+  afficherDonnees();
+}
+
+function validerPari(totalOdds) {
+  historique.unshift({ date: new Date().toLocaleDateString('fr-FR'), cote: totalOdds, selections: [...panier] });
+  localStorage.setItem('yahikoHistorique', JSON.stringify(historique));
+  showToast("🎉 Ticket enregistré !");
+  panier = []; localStorage.setItem('yahikoPanier', JSON.stringify(panier));
+  mettreAJourBarrePanier(); fermerModal(); afficherDonnees();
+}
+
+function fermerModal(event) {
+  if(event && event.target !== document.getElementById('modalOverlay') && !event.target.classList.contains('close-modal')) return;
+  document.getElementById('modalOverlay').classList.remove('active');
+}
+
+function toggleFavori(matchId, element) {
+  if (favoris.includes(matchId)) { favoris = favoris.filter(id => id !== matchId); element.classList.remove('active'); }
+  else { favoris.push(matchId); element.classList.add('active'); }
+  localStorage.setItem('yahikoFavoris', JSON.stringify(favoris));
+}
+
+function afficherFavoris() {
+  const favorisList = document.getElementById('favorisList');
+  if (favoris.length === 0) { favorisList.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Aucun favori.</p>'; return; }
+  const matchsFavoris = donneesGlobales.filter(m => favoris.includes(m.id));
+  let html = '';
+  matchsFavoris.forEach(match => {
+    const heure = new Date(match.commence_time).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+    html += `<div class="match-card" style="margin-bottom:15px;"><div class="star-icon active" onclick="toggleFavori('${match.id}', this); afficherFavoris();">★</div><div class="card-header"><div class="competition-name">${match.sport_title}</div><div class="match-time">⏰ ${heure}</div></div><div class="teams-container"><div class="team"><div class="team-logo">${match.home_team.substring(0, 3).toUpperCase()}</div><div class="team-name">${match.home_team}</div></div><div class="vs-circle">VS</div><div class="team"><div class="team-logo">${match.away_team.substring(0, 3).toUpperCase()}</div><div class="team-name">${match.away_team}</div></div></div></div>`;
+  });
+  favorisList.innerHTML = html;
+}
+
+function afficherHistorique() {
+  const histList = document.getElementById('historiqueList');
+  if (historique.length === 0) { histList.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Aucun ticket validé.</p>'; return; }
+  let html = '';
+  historique.forEach(pari => {
+    html += `<div class="match-card" style="padding: 15px; margin-bottom: 15px;"><div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom: 1px solid var(--border-color); padding-bottom:10px;"><span style="color:var(--text-muted); font-size:12px;">📅 ${pari.date}</span><span style="color:var(--gold); font-weight:bold;">Cote: ${parseFloat(pari.cote).toFixed(2)}</span></div><div style="font-size:13px; margin-bottom:10px;">${pari.selections.map(s => `<div>• ${s.matchNom} : <b>${s.nom}</b></div>`).join('')}</div></div>`;
+  });
+  histList.innerHTML = html;
+}
+
+chargerMatchs();
+mettreAJourBarrePanier();
+</script>
+</body>
+</html>
 function afficherDonnees() {
   const list = document.getElementById('list');
   if (!donneesGlobales || donneesGlobales.length === 0) {
